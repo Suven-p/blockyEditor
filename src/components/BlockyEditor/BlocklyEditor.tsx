@@ -1,53 +1,55 @@
 import React, { useRef, useState } from 'react';
 
-import { BlocklyWorkspace, WorkspaceSvg, useBlocklyWorkspace } from 'react-blockly';
+import { WorkspaceSvg, useBlocklyWorkspace } from 'react-blockly';
 import ConfigFiles from 'react-blockly/dist/initContent/content';
 import { ToolboxInfo } from 'blockly/core/utils/toolbox';
 import { javascriptGenerator } from 'blockly/javascript';
 import { pythonGenerator } from 'blockly/python';
 import { dartGenerator } from 'blockly/dart';
 
-
-
 const TestEditor = () => {
-  const onWorkspaceChange = (workspace: WorkspaceSvg) => {
-    workspace.registerButtonCallback('myFirstButtonPressed', () => {
-        alert('button is pressed');
-    });
-    const code = languageGenerator.workspaceToCode(workspace);
-    setGeneratedCode(code);
-  };
+    const onWorkspaceChange = (workspace: WorkspaceSvg) => {
+        workspace.registerButtonCallback('myFirstButtonPressed', () => {
+            alert('button is pressed');
+        });
+        const code = languageGenerator.workspaceToCode(workspace);
+        setGeneratedCode(code);
+    };
 
     const [toolboxConfiguration, setToolboxConfiguration] =
         React.useState<ToolboxInfo>(ConfigFiles.INITIAL_TOOLBOX_JSON);
     const [generatedCode, setGeneratedCode] = useState('');
     const [languageGenerator, setLanguageGenerator] =
-        useState(javascriptGenerator);
+        useState<any>(javascriptGenerator);
     const blocklyRef = useRef(null);
-    const { workspace, xml } = useBlocklyWorkspace({
-      ref: blocklyRef,
-      toolboxConfiguration:toolboxConfiguration,
-      workspaceConfiguration:{
-          grid: {
-              spacing: 20,
-              length: 3,
-              colour: '#ccc',
-              snap: true,
-          },
-      },
-      initialXml:ConfigFiles.INITIAL_XML,
-      // initialJson:ConfigFiles.INITIAL_JSON,
-      // className:'fill-height',
-      onWorkspaceChange:onWorkspaceChange,
+    const { workspace } = useBlocklyWorkspace({
+        ref: blocklyRef,
+        toolboxConfiguration: toolboxConfiguration,
+        workspaceConfiguration: {
+            grid: {
+                spacing: 20,
+                length: 3,
+                colour: '#ccc',
+                snap: true,
+            },
+        },
+        initialXml: ConfigFiles.INITIAL_XML,
+        // initialJson:ConfigFiles.INITIAL_JSON,
+        // className:'fill-height',
+        onWorkspaceChange: onWorkspaceChange,
     });
 
-    const languages = {
+    const languages: Record<string, any> = {
         Javascript: javascriptGenerator,
         Python: pythonGenerator,
         Dart: dartGenerator,
     };
-    const onLanguageChangeHandler = (event) => {
-        setLanguageGenerator(languages[event.target.value]);
+    const onLanguageChangeHandler: React.ChangeEventHandler<
+        HTMLSelectElement
+    > = (event) => {
+        const language = event.target.value;
+        const newGenerator = languages[language];
+        setLanguageGenerator(newGenerator);
     };
 
     React.useEffect(() => {
@@ -115,7 +117,7 @@ const TestEditor = () => {
                 })}
             </select>
 
-            <div ref={blocklyRef} style={{width: '80%', height: '300px'}} />
+            <div ref={blocklyRef} style={{ width: '80%', height: '300px' }} />
             <textarea
                 style={{ height: '200px', width: '400px' }}
                 value={generatedCode}
